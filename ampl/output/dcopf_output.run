@@ -1,0 +1,5 @@
+# export results of teta_dc variables 
+let fileOut := "dcopf_angle_results.txt";
+printf "#bus_cc teta_dc\n" > (fileOut); 
+printf{n in BUSCC} "%i %.5f\n", n, teta_dc[n] > (fileOut);
+close (fileOut);

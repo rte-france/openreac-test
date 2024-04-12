@@ -1,0 +1,11 @@
+# set of buses in the main connected component
+let fileOut := "connected_component_results.txt";
+printf "#bus_cc\n" > (fileOut); 
+printf{n in BUSCC} "%i\n", n > (fileOut);
+close (fileOut);
+
+# null_phase_bus parameter
+let fileOut := "null_phase_bus.txt";
+printf "#null_phase_bus\n" > (fileOut);
+printf "%i\n", null_phase_bus > (fileOut);
+close (fileOut);

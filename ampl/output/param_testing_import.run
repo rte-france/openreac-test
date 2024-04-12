@@ -1,0 +1,21 @@
+#
+# Read testing options
+#
+model;
+set PARAM_TEST_KEYS;
+param PARAM_TEST_VALUES{PARAM_TEST_KEYS} symbolic;
+data;
+param: PARAM_TEST_KEYS: PARAM_TEST_VALUES := include "param_testing.txt";
+model;
+
+param export_connex_component default 0;
+if "export_connex_component" in PARAM_TEST_KEYS then let export_connex_component := num(PARAM_TEST_VALUES["export_connex_component"]);
+
+param export_dcopf default 0;
+if "export_dcopf" in PARAM_TEST_KEYS then let export_dcopf := num(PARAM_TEST_VALUES["export_dcopf"]);
+
+param export_acopf_preprocessing default 0;
+if "export_acopf_preprocessing" in PARAM_TEST_KEYS then let export_acopf_preprocessing := num(PARAM_TEST_VALUES["export_acopf_preprocessing"]); 
+
+param export_acopf default 0;
+if "export_acopf" in PARAM_TEST_KEYS then let export_acopf := num(PARAM_TEST_VALUES["export_acopf"]); 

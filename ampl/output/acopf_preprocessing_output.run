@@ -1,0 +1,20 @@
+# export results of acopf_preprocessing.run/mod files 
+let fileOut := "acopf_preprocessing_results.run";
+
+# corrected_unit_Qmin info
+printf "param "             > (fileOut);
+display corrected_unit_Pmin > (fileOut);
+
+# corrected_unit_Qmin info
+printf "param "             > (fileOut);
+display corrected_unit_Pmax > (fileOut);
+
+# corrected_unit_Qmin info
+printf "param "             > (fileOut);
+display corrected_unit_Qmin > (fileOut);
+
+# corrected_unit_Qmin info
+printf "param "             > (fileOut);
+display corrected_unit_Qmax > (fileOut);
+
+close (fileOut);

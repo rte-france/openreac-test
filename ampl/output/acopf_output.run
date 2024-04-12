@@ -1,0 +1,10 @@
+# export results of acopf.run/mod files 
+let fileOut := "acopf_voltage_results.txt";
+printf "#bus_cc v teta\n" > (fileOut);
+printf{n in BUSCC} "%i %.5f %.5f\n", n, V[n], teta[n] > (fileOut);
+close (fileOut);
+
+let fileOut := "acopf_flows_results.txt";
+printf "#num bus1 bus2 P1 Q1 P2 Q2\n" > (fileOut);
+printf{(qq,m,n) in BRANCHCC} "%i %i %i %.5f %.5f %.5f %.5f\n", qq, m, n, Red_Tran_Act_Dir[qq,m,n], Red_Tran_Rea_Dir[qq,m,n], Red_Tran_Act_Inv[qq,m,n], Red_Tran_Rea_Inv[qq,m,n] > (fileOut); 
+close (fileOut);

@@ -1,0 +1,3 @@
+data;
+param: BUSCC: teta_dc := include "dcopf_angle_results.txt";
+model;
