@@ -13,7 +13,7 @@ OUTPUT_PATH = ROOT_PROJECT / "output"
 AMPL_DIVIDED_CODE_PATH = ROOT_PROJECT / "ampl" / "divided"
 
 PYTHON = ROOT_PROJECT / "python"
-GOLDEN_MASTER_PATH = PYTHON / "resources" / "golden_master"
+GOLDEN_MASTER_PATH = PYTHON / "golden_master" / "resources"
 
 def open_reac_output_comparison(test, verbose=False):
     """
@@ -21,13 +21,12 @@ def open_reac_output_comparison(test, verbose=False):
     Return: True if no difference, False otherwise.
     """
     golden_test_path = GOLDEN_MASTER_PATH / test
-    output_test_path = OUTPUT_PATH / test # this path must exist before copy/paste the files
+    output_test_path = OUTPUT_PATH # this path must exist before copy/paste the files
 
     # copy/paste test network data and open reac parameter files
     for file in os.listdir(golden_test_path):
-        if not file.endswith(".txt") or file == INDICATORS_FILE:
-            continue
-        shutil.copy(golden_test_path / file, output_test_path / file)
+        if file.endswith(".txt") and file != INDICATORS_FILE:
+            shutil.copy(golden_test_path / file, output_test_path / file)
 
     # copy/paste divided ampl code to test its execution
     shutil.copytree(AMPL_DIVIDED_CODE_PATH, output_test_path, dirs_exist_ok=True)

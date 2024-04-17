@@ -9,6 +9,7 @@ DELTA_ANGLE = 0.001
 DELTA_P = 0.001
 DELTA_Q = 0.001
 
+
 def is_diff_less_than_threshold(x, y, threshold):
     """
     Parameters:
@@ -20,6 +21,7 @@ def is_diff_less_than_threshold(x, y, threshold):
         bool: True if |a - b| < threshold, False otherwise.
     """
     return abs(x - y) < threshold
+
 
 #########################################################
 # Import open reac results
@@ -68,6 +70,7 @@ def import_acopf_results(output_path):
     flows_results.rename(columns=lambda x: x.replace('#', ''), inplace=True)
     
     return voltage_results, flows_results
+
 
 #########################################################
 # Functions to run specific Open Reac results
