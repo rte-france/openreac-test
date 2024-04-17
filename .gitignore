@@ -1,4 +1,13 @@
+# IntelliJ
+.idea/
+*.iml
+
+# VSCode
+.vscode
+
+# Byte-compiled
 __pycache__
 .pytest_cache
 
+# Execution
 /output
