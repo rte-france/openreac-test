@@ -1,4 +1,4 @@
 data;
-set BUSCC := include "connex_component_results.txt";
+set BUSCC := include "connected_component_results.txt";
 let null_phase_bus := include null_phase_bus.txt;
 model;

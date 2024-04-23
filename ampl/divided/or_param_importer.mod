@@ -1,4 +1,20 @@
 ###############################################################################
+#
+# Copyright (c) 2022 2023, RTE (http://www.rte-france.com)
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+#
+###############################################################################
+
+###############################################################################
+# Reactive OPF
+# Author:  Jean Maeght 2022 2023
+# Author:  Manuel Ruiz 2023 2024
+###############################################################################
+
+
+###############################################################################
 # Overrides for voltage bounds of substations
 ###############################################################################
 #ampl_network_substations_override.txt
