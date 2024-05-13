@@ -26,7 +26,8 @@ OR_CSV_RESULTS_FILES = {"reactiveopf_results_generators.csv",
                  "reactiveopf_results_rtc.csv", 
                  "reactiveopf_results_shunts.csv", 
                  "reactiveopf_results_static_var_compensators.csv", 
-                 "reactiveopf_results_vsc_converter_stations.csv"}
+                 "reactiveopf_results_vsc_converter_stations.csv",
+                 "reactiveopf_results_voltages.csv"}
 
 INDICATORS_FILE = "reactiveopf_results_indic.txt"
 AMPL_PRINTING_FILE = "AMPL_runner_0.out"

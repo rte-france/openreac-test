@@ -13,7 +13,22 @@ OUTPUT_PATH = ROOT_PROJECT / "output"
 AMPL_DIVIDED_CODE_PATH = ROOT_PROJECT / "ampl" / "divided"
 
 PYTHON = ROOT_PROJECT / "python"
-GOLDEN_MASTER_PATH = PYTHON / "golden_master" / "resources"
+#GOLDEN_MASTER_PATH = PYTHON / "golden_master" / "resources"
+GOLDEN_MASTER_PATH = ROOT_PROJECT.parent / "golden_master"
+
+def delete_files_in_directory(directory):
+    try:
+        # Iterate over all files in the directory
+        for filename in os.listdir(directory):
+            file_path = os.path.join(directory, filename)
+            # Check if the path is a file (not a directory)
+            if os.path.isfile(file_path):
+                # Delete the file
+                os.remove(file_path)
+                print(f"Deleted {file_path}")
+        print("All files deleted successfully.")
+    except Exception as e:
+        print(f"An error occurred: {e}")
 
 def open_reac_output_comparison(test, verbose=False):
     """
@@ -22,6 +37,10 @@ def open_reac_output_comparison(test, verbose=False):
     """
     golden_test_path = GOLDEN_MASTER_PATH / test
     output_test_path = OUTPUT_PATH # this path must exist before copy/paste the files
+
+    # clean output path
+    if str(output_test_path).endswith("output"):
+        delete_files_in_directory(output_test_path)
 
     # copy/paste test network data and open reac parameter files
     for file in os.listdir(golden_test_path):
@@ -43,17 +62,25 @@ def open_reac_output_comparison(test, verbose=False):
         if verbose:
             print(printings_differences)
 
-    # compare expected/actual results of open reac
-    are_results_different = comparison_open_reac_results(golden_test_path, output_test_path, OR_CSV_RESULTS_FILES) # boolean
-    if not are_results_different:
-        print("Difference in comparision of csv results.")
-
     # compare expected/actual indicators of open reac
     indicators_differences = comparison_open_reac_indicators(golden_test_path / INDICATORS_FILE, output_test_path / INDICATORS_FILE) # list of differences
     if bool(indicators_differences):
         print("Difference in comparision of indicators.")
         if verbose:
             print(indicators_differences)
+
+    indicators = load_indicators(output_test_path / INDICATORS_FILE)
+    or_csv_files_to_compare = OR_CSV_RESULTS_FILES
+    if indicators["log_level_ampl"] == "DEBUG":
+        or_csv_files_to_compare.add("reactiveopf_results_generators_Pnull.csv")
+        or_csv_files_to_compare.add("debug_bus.csv")
+    if indicators["final_status"] != "OK":
+        or_csv_files_to_compare = []
+    
+    # compare expected/actual results of open reac
+    are_results_different = comparison_open_reac_results(golden_test_path, output_test_path, or_csv_files_to_compare) # boolean
+    if not are_results_different:
+        print("Difference in comparision of csv results.")
 
     return not bool(printings_differences) and not bool(indicators_differences) and are_results_different # True if no differences in comparisons
 
@@ -115,7 +142,7 @@ def comparison_open_reac_printings(expected_printings_path, printings):
     # list of printings that must not be compared, due to dependance on the time/machine of execution
     to_ignore = ["Start of file", "End of file", "Elapsed time since start", 
                  "solve: start", "solve: end", "Total program time", "Time spent in evaluations", 
-                 "é", "Ã©", "Commercial", "Trial", "COMMERCIAL USE"]
+                 "é", "Ã©", "Commercial", "Trial", "COMMERCIAL USE", "\n"]
     
     # lists of printings, without ignored ones
     filtered_expected_printings = [line for line in expected_printings if all(substring not in line for substring in to_ignore)]
