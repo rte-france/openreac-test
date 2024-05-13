@@ -13,8 +13,8 @@ OUTPUT_PATH = ROOT_PROJECT / "output"
 AMPL_DIVIDED_CODE_PATH = ROOT_PROJECT / "ampl" / "divided"
 
 PYTHON = ROOT_PROJECT / "python"
-#GOLDEN_MASTER_PATH = PYTHON / "golden_master" / "resources"
-GOLDEN_MASTER_PATH = ROOT_PROJECT.parent / "golden_master"
+GOLDEN_MASTER_PATH = PYTHON / "golden_master" / "resources"
+#GOLDEN_MASTER_PATH = ROOT_PROJECT.parent / "golden_master"
 
 def delete_files_in_directory(directory):
     try:
@@ -41,7 +41,7 @@ def open_reac_output_comparison(test, verbose=False):
     # clean output path
     if str(output_test_path).endswith("output"):
         delete_files_in_directory(output_test_path)
-
+    
     # copy/paste test network data and open reac parameter files
     for file in os.listdir(golden_test_path):
         if file.endswith(".txt") and file != INDICATORS_FILE:
@@ -136,13 +136,26 @@ def comparison_open_reac_printings(expected_printings_path, printings):
     Compare the printings given as a list in printings, and in the directory expected_printings_path.
     Return: The list of differences between the expected/actual printings of open reac ampl code.
     """
-    file = open(expected_printings_path)
+    file = open(expected_printings_path, 'r', encoding='utf-8')
     expected_printings = file.readlines()
+    #print(expected_printings)
+#
+    #print("##############################")
+    #print("##############################")
+    #print("##############################")
+    #print("##############################")
+    #print("##############################")
+    #print("##############################")
+    #print("##############################")
+    #print("##############################")
+    #print("##############################")
+#
+    #print(printings)
 
     # list of printings that must not be compared, due to dependance on the time/machine of execution
     to_ignore = ["Start of file", "End of file", "Elapsed time since start", 
                  "solve: start", "solve: end", "Total program time", "Time spent in evaluations", 
-                 "é", "Ã©", "Commercial", "Trial", "COMMERCIAL USE", "\n"]
+                 "é", "Ã©", "Commercial", "Trial", "COMMERCIAL USE"]
     
     # lists of printings, without ignored ones
     filtered_expected_printings = [line for line in expected_printings if all(substring not in line for substring in to_ignore)]
@@ -150,8 +163,13 @@ def comparison_open_reac_printings(expected_printings_path, printings):
     
     # count the number of different printings
     counter_expected = Counter(filtered_expected_printings)
+    counter_expected.pop("\n")
     counter_actual = Counter(filtered_act_printings)
+    counter_actual.pop("\n")
     difference_expected_actual = counter_expected - counter_actual # printings in expected but not in actual (with occurrences)
     difference_actual_expected = counter_actual - counter_expected # printings in actual but not in expected
 
     return difference_expected_actual + difference_actual_expected
+
+if __name__ == "__main__":
+    open_reac_output_comparison("ieee14", True)
