@@ -103,6 +103,20 @@ printf "\n";
 # A few information
 ###############################################################################
 
+if 1 in LOG_INFO then {
+  display
+    maximal_voltage_upper_bound, minimal_voltage_lower_bound,
+    card(SUBSTATIONS),card(BUS),card(BUS2),card(BUSCC),card(BUS2 diff BUSCC),card(BUSVV),
+    card(BRANCH),card(BRANCHCC),card(BRANCHZNULL),card(BRANCHCC diff BRANCHZNULL),
+    card(UNIT),card(UNITCC),card(UNITON),card(UNITON diff UNIT_FIXQ),card(UNIT_FIXQ),
+    card(LOAD),card(LOADCC),
+    card(SHUNTCC),card(SHUNT_FIX),card(SHUNT_VAR),
+    card(SVC),card(SVCCC),card(SVCON),
+    card(VSCCONV),card(VSCCONVON),
+    card(LCCCONV),card(LCCCONVON)
+;
+}
+
 # Is the case power globally power balanced?
 let temp1 := sum{(c,n) in LOADCC} load_PFix[1,c,n];
 let temp2 := sum{(g,n) in UNITON} unit_Pc[1,g,n];
