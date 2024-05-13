@@ -138,19 +138,6 @@ def comparison_open_reac_printings(expected_printings_path, printings):
     """
     file = open(expected_printings_path, 'r', encoding='utf-8')
     expected_printings = file.readlines()
-    #print(expected_printings)
-#
-    #print("##############################")
-    #print("##############################")
-    #print("##############################")
-    #print("##############################")
-    #print("##############################")
-    #print("##############################")
-    #print("##############################")
-    #print("##############################")
-    #print("##############################")
-#
-    #print(printings)
 
     # list of printings that must not be compared, due to dependance on the time/machine of execution
     to_ignore = ["Start of file", "End of file", "Elapsed time since start", 
