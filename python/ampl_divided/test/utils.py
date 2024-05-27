@@ -73,6 +73,24 @@ def run_acopf(network, ampl_code_path, output_path, resources_path):
             avoided_blocks=non_executed_blocks, output_path=output_path, resources_path=resources_path,
             ampl_files_to_import_results_non_executed_blocks=ampl_files_to_import_results_non_executed_blocks,
             results_files_non_executed_blocks=results_files_non_executed_blocks)
+    
+def run_acopf_preprocessing(network, ampl_code_path, output_path, resources_path):
+    """
+    Run ACOPF preprocessing block on given network, using given AMPL code, in given output path.
+
+    The AMPL code must be divided in three different directories : 
+        - ampl_code_path/divided, for the divided ampl code tested (in functionnal blocks).
+        - ampl_code_path/export_ampl_files, for the code exporting the blocks results.
+        - ampl_code_path/importer_ampl_files, for the code importing the results of the blocks preceding the one tested. 
+    """
+
+    non_executed_blocks = ["connected_component", "dcopf"]
+    ampl_files_to_import_results_non_executed_blocks = [block + "_results_importer.run" for block in non_executed_blocks]
+    results_files_non_executed_blocks = ["connected_component_results.txt", "null_phase_bus.txt", "dcopf_angle_results.txt"]
+    run_block(network=network, ampl_code_path=ampl_code_path, tested_blocks=["acopf_preprocessing"], 
+            avoided_blocks=non_executed_blocks, output_path=output_path, resources_path=resources_path,
+            ampl_files_to_import_results_non_executed_blocks=ampl_files_to_import_results_non_executed_blocks,
+            results_files_non_executed_blocks=results_files_non_executed_blocks)
 
 
 def run_all_the_blocks(network, ampl_code_path, output_path):
@@ -139,4 +157,11 @@ def get_reactiveopf_run_file_to_test_block(reactiveopf_run_path, avoided_blocks,
     # add ampl export after execution of tested_block
     ampl_execution_of_tested_blocks = ["include \"" + tested_block + ".run\";\n" for tested_block in tested_blocks]
     ampl_export_of_tested_blocks = ["include \"" + tested_block + "_output.run\";\n" for tested_block in tested_blocks]
-    add_lines_after_flags_in_file(reactiveopf_run_path, lines_after_which_add=ampl_execution_of_tested_blocks, lines_to_add=ampl_export_of_tested_blocks)
+
+    # add the line that exits the code after tested_block has been executed
+    ampl_exit_line = "include \"reactiveopfexit.run\";\n"
+    ampl_exit_flag = ampl_export_of_tested_blocks[-1]
+
+    add_lines_after_flags_in_file(reactiveopf_run_path, 
+                                  lines_after_which_add=ampl_execution_of_tested_blocks + [ampl_exit_flag], 
+                                  lines_to_add=ampl_export_of_tested_blocks + [ampl_exit_line])

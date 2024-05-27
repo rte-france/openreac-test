@@ -70,3 +70,16 @@ def load_acopf_output(path):
     flows_results.rename(columns=lambda x: x.replace('#', ''), inplace=True)
     
     return voltage_results, flows_results
+
+def load_acopf_preprocessing_output(path):
+    """
+    Load the output of the ACOPF preprocessing block. It consists of bounds for each active generator. 
+
+    Args:
+        path: Path towards acopf preprocessing output.
+    """
+    generators_bounds_file_name = "acopf_preprocessing_results.txt"
+    generators_bounds = pd.read_csv(path / generators_bounds_file_name, sep=" ", header=0)
+    generators_bounds.rename(columns=lambda x: x.replace('#', ''), inplace=True)
+    
+    return generators_bounds
