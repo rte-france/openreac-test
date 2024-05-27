@@ -1,6 +1,5 @@
-import pypowsybl as pp
+import pypowsybl.network as pn
 import pandas as pd
-
 
 def network_2_buses_connected_by_1_line():
     """
@@ -11,7 +10,7 @@ def network_2_buses_connected_by_1_line():
      B1         B2
 
     """
-    network = pp.network.create_empty("network_2_buses_connected_by_1_line")
+    network = pn.create_empty("network_2_buses_connected_by_1_line")
     network.create_substations(id=["S1", "S2"])
     voltage_levels = pd.DataFrame.from_records(index='id', 
                                                data=[{'substation_id': 'S1', 'id': 'VL1', 'topology_kind': 'BUS_BREAKER', 'nominal_v': 400},
@@ -36,7 +35,7 @@ def network_3_nodes_connected_by_2_lines():
      B1         B2        B3
 
     """
-    network = pp.network.create_empty()
+    network = pn.create_empty()
     network.create_substations(id=["S1", "S2", "S3"])
     voltage_levels = pd.DataFrame.from_records(index='id', 
                                                data=[{'substation_id': 'S1', 'id': 'VL1', 'topology_kind': 'BUS_BREAKER', 'nominal_v': 400},
@@ -67,7 +66,7 @@ def network_3_nodes_connected_by_2_lines_with_1_shunt():
      B1         B2        B3
 
     """
-    network = pp.network.create_empty()
+    network = pn.create_empty()
     network.create_substations(id=["S1", "S2"])
     voltage_levels = pd.DataFrame.from_records(index='id', 
                                                data=[{'substation_id': 'S1', 'id': 'VL1', 'topology_kind': 'BUS_BREAKER', 'nominal_v': 400},
@@ -108,7 +107,7 @@ def network_3_nodes_connected_by_1_line_and_1_transformer():
                  \    /
                   T2WT
     """
-    network = pp.network.create_empty()
+    network = pn.create_empty()
     network.create_substations(id=["S1", "S2"])
     voltage_levels = pd.DataFrame.from_records(index='id', 
                                                data=[{'substation_id': 'S1', 'id': 'VL1', 'topology_kind': 'BUS_BREAKER', 'nominal_v': 400},

@@ -1,3 +1,19 @@
+import os
+
+def delete_all_the_files_in_directory(directory):
+    try:
+        # Iterate over all files in the directory
+        for filename in os.listdir(directory):
+            file_path = os.path.join(directory, filename)
+            # Check if the path is a file (not a directory)
+            if os.path.isfile(file_path):
+                # Delete the file
+                os.remove(file_path)
+                print(f"Deleted {file_path}")
+        print("All files deleted successfully.")
+    except Exception as e:
+        print(f"An error occurred: {e}")
+
 def replace_lines_in_file(file_path, lines_to_replace, replacements):
     """
     Replace all the lines specified in lines_to_replace list by the lines specified in replacements list, in given file.
@@ -41,29 +57,3 @@ def add_lines_after_flags_in_file(file_path, lines_after_which_add, lines_to_add
 
     with open(file_path, 'w') as file:
         file.writelines(lines)
-
-def get_reactiveopf_run_file_to_test_block(reactiveopf_run_path, avoided_blocks, tested_blocks):
-    """
-    Modify reactiveopf.run given file, to avoid the execution of the avoided_blocks, and replace it by importers of the results.
-    It also add the exporter of the tested_block, to test its output.
-    """
-    # replace lines executing avoided blocks by others importing their results
-    ampl_execution_of_avoided_blocks = ["include \"" + block + ".run\";\n" for block in avoided_blocks]
-    files_to_import_results_of_avoided_blocks = [block + "_results_importer.run" for block in avoided_blocks]
-    ampl_import_of_avoided_blocks = ["include \"" + import_results + "\";\n" for import_results in files_to_import_results_of_avoided_blocks]         
-    replace_lines_in_file(reactiveopf_run_path, lines_to_replace=ampl_execution_of_avoided_blocks, replacements=ampl_import_of_avoided_blocks)
-
-    # add ampl export after execution of tested_block
-    ampl_execution_of_tested_blocks = ["include \"" + tested_block + ".run\";\n" for tested_block in tested_blocks]
-    ampl_export_of_tested_blocks = ["include \"" + tested_block + "_output.run\";\n" for tested_block in tested_blocks]
-    add_lines_after_flags_in_file(reactiveopf_run_path, lines_after_which_add=ampl_execution_of_tested_blocks, lines_to_add=ampl_export_of_tested_blocks)
-
-if __name__ == "__main__":
-    import pathlib, shutil
-    PARENT = pathlib.Path(__file__).parent.parent.parent
-    TEMPO = PARENT / "tempo"
-    AMPL_CODE = PARENT / "ampl"
-    shutil.copyfile(AMPL_CODE / "divided" / "reactiveopf.run", TEMPO / "reactiveopf.run")
-    get_reactiveopf_run_file_to_test_block(reactiveopf_run_path=TEMPO / "reactiveopf.run", avoided_blocks=["connex_component", "dcopf"], tested_block="acopf")
-
-

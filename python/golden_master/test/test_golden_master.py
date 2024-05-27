@@ -1,10 +1,9 @@
-# imports
 import pytest
 import os
-from utils import *
+from .utils import *
+from shared.config import *
 
 TESTS = [test for test in os.listdir(GOLDEN_MASTER_PATH)]
-
 @pytest.mark.parametrize("test", TESTS)
 def test_output_comparison(test):
     """
