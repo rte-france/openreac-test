@@ -18,28 +18,44 @@
 
 
 
-*** Start of file reactiveopf.run at Fri Apr 12 16:11:49 2024
+*** Start of file reactiveopf.run at Mon May 13 15:59:33 2024
 
 ** Reading algorithmic controls and parameters in file
 PARAM_ALGO_VALUES [*] :=
-      buses_with_reactive_slacks  NO_GENERATION
-                  log_level_ampl  INFO
-                log_level_knitro  2
-max_plausible_high_voltage_limit  1.5
- min_plausible_low_voltage_limit  0.5
-                objective_choice  0
+                                    PQmax 9000
+                                    Pnull    0.01
+                                    Znull    0.0001
+               buses_with_reactive_slacks CONFIGURED
+                              coeff_alpha    1
+                              defaultPmax 1000
+                              defaultPmin    0
+                     defaultQmaxPmaxRatio    0.3
+        default_constraint_scaling_factor    1
+          default_variable_scaling_factor    1
+                  epsilon_nominal_voltage    1
+                    ignore_voltage_bounds    0
+                           log_level_ampl INFO
+                         log_level_knitro    2
+         max_plausible_high_voltage_limit    1.5
+          min_plausible_low_voltage_limit    0.5
+                           minimalQPrange    1
+                         objective_choice    1
+                     ratio_voltage_target    0.7
+   reactive_slack_variable_scaling_factor    0.1
+transformer_ratio_variable_scaling_factor    0.001
 ;
 
 Parameter: log level of ampl := INFO
 Parameter: log level of knitro := 2
-Parameter: choice for objective function := 0 (active power minimization)
+Parameter: choice for objective function := 1 (voltage targets are Vmin+ratio*(Vmax-Vmin))
+Parameter: ratio for voltage target is := 0.700000 (70.00%)
 Parameter: coeff_alpha to choose wether generation vary homogeneously (coeff_alpha=1) or independantly (coeff_alpha=0) is := 1.00
 Parameter: threshold to decide wether an active or reactive power value is zero Pnull:=0.01 (MW or Mvar or MVA)
 Parameter: threshold to detect zero impedance branch Znull:=0.0001 pu
 Parameter: for consistency checks of minimum nominal voltages epsilon_nominal_voltage:= 1 kV
 Parameter: for consistency of voltage bounds, min_plausible_low_voltage_limit:= 0.5 pu
 Parameter: for consistency of voltage bounds, max_plausible_high_voltage_limit:= 1.5 pu
-Parameter: choice for buses with reactive slacks in ACOPF := 'NO_GENERATION' (buses without generation (no generator, svc or vsc))
+Parameter: choice for buses with reactive slacks in ACOPF := 'CONFIGURED' (buses given as parameters in param_buses_with_reactive_slack.txt)
 Parameter: maximum for generating units parameters Pmin Pmax Qmin Qmax = 9000 MW or Mvar
 Parameter: defaultPmax = 1000 MW
 Parameter: defaultPmin = 0 MW
@@ -47,12 +63,16 @@ Parameter: defaultQmaxPmaxRatio = 0.3 Mvar/MW
 Parameter: defaultQmin = -300 Mvar
 Parameter: defaultQmax = 300 Mvar
 Parameter: minimalQPrange = 1 MW or Mvar
+Parameter: default scaling factor for variables := 1.000
+Parameter: default scaling factor for constraints := 1.000
+Parameter: scaling factor for reactive slack variables := 0.100
+Parameter: scaling factor for tranformer ratio variables := 0.001
 
 Computation of bus with largest number of branches connected, in order to fix phase to 0 and to choose on which connex component reacive OPF will run
 Bus 135kV with most branches: 4 in substation VL4/VL4 with 5 connected branches
 
 ######################################################################
-** CCcomp solve: start (Fri Apr 12 16:11:50 2024)
+** CCcomp solve: start (Mon May 13 15:59:33 2024)
 
 Artelys Knitro 13.2.0: outlev=3
 
@@ -116,7 +136,7 @@ Final optimality error  (abs / rel) =   9.99e-16 / 9.99e-16
 # of function evaluations           =          0
 # of gradient evaluations           =          0
 # of Hessian evaluations            =          0
-Total program time (secs)           =       0.002 (     0.000 CPU time)
+Total program time (secs)           =       0.000 (     0.000 CPU time)
 Time spent in evaluations (secs)    =       0.000
 
 ===============================================================================
@@ -130,7 +150,7 @@ suffix opterror OUT;
 suffix numfcevals OUT;
 suffix numiters OUT;
 
-** CCcomp solve: end   (Fri Apr 12 16:11:50 2024 -> Fri Apr 12 16:11:50 2024)
+** CCcomp solve: end   (Mon May 13 15:59:33 2024 -> Mon May 13 15:59:33 2024)
 ######################################################################
 
 
@@ -148,8 +168,8 @@ card(BUS2) = 14
 card(BUSCC) = 14
 card(BUS2 diff BUSCC) = 0
 card(BUSVV) = 14
-card(BUSCC_SLACK) = 12
-card(BUSCC diff BUSCC_SLACK) = 2
+card(BUSCC_SLACK) = 0
+card(BUSCC diff BUSCC_SLACK) = 14
 card(BRANCH) = 20
 card(BRANCHCC) = 20
 card(BRANCHZNULL) = 0
@@ -217,7 +237,7 @@ Corrected extremal values: 50 <= 'corrected_unit_QP' <= 300
 Corrected extremal values: 50 <= 'corrected_unit_Qp' <= 300
 
 ######################################################################
-** DCopf solve: start (Fri Apr 12 16:11:50 2024)
+** DCopf solve: start (Mon May 13 15:59:33 2024)
 
 Artelys Knitro 13.2.0: outlev=3
 
@@ -281,7 +301,7 @@ Final optimality error  (abs / rel) =   1.02e-06 / 1.02e-08
 # of function evaluations           =          0
 # of gradient evaluations           =          0
 # of Hessian evaluations            =          0
-Total program time (secs)           =       0.003 (     0.000 CPU time)
+Total program time (secs)           =       0.002 (     0.016 CPU time)
 Time spent in evaluations (secs)    =       0.000
 
 ===============================================================================
@@ -290,7 +310,7 @@ Knitro 13.2.0: Locally optimal or satisfactory solution.
 objective 28.05829059; feasibility error 0.00027
 4 iterations; 0 function evaluations
 
-** DCopf solve: end   (Fri Apr 12 16:11:50 2024 -> Fri Apr 12 16:11:50 2024)
+** DCopf solve: end   (Mon May 13 15:59:33 2024 -> Mon May 13 15:59:33 2024)
 ######################################################################
 
 
@@ -318,7 +338,7 @@ Branches with large Delta Teta:
 'L3-4-1' R=0.0670 X=0.1710 delta=-0.04 teta_m=-0.04 teta_n=0.00 F=-24.19
 
 ######################################################################
-** ACopf solve: start (Fri Apr 12 16:11:50 2024)
+** ACopf solve: start (Mon May 13 15:59:33 2024)
 
 Artelys Knitro 13.2.0: opttol=1
 opttolabs=1e-1
@@ -342,14 +362,13 @@ maxit:                   200
 opttol:                  1
 opttol_abs:              0.1
 outlev:                  3
-Knitro shifted start point further inside presolved bounds (24 variables).
 
 Problem Characteristics                                 (   Presolved)
 -----------------------
 Objective goal:  Minimize
 Objective type:  quadratic
-Number of variables:                                 54 (          54)
-    bounded below only:                              24 (          24)
+Number of variables:                                 30 (          30)
+    bounded below only:                               0 (           0)
     bounded above only:                               0 (           0)
     bounded below and above:                         30 (          30)
     fixed:                                            0 (           0)
@@ -364,67 +383,68 @@ Number of constraints:                               28 (          28)
     linear two-sided inequalities:                    0 (           0)
     quadratic two-sided inequalities:                 0 (           0)
     gen. nonlinear two-sided inequalities:            0 (           0)
-Number of nonzeros in Jacobian:                     232 (         232)
+Number of nonzeros in Jacobian:                     208 (         208)
 Number of nonzeros in Hessian:                      112 (         112)
 
 Knitro using the Interior-Point/Barrier Direct algorithm.
 
   Iter      Objective      FeasError   OptError    ||Step||    CGits 
 --------  --------------  ----------  ----------  ----------  -------
-       0    5.275317e+02   1.933e+02
-       1    4.611904e+02   1.139e+02   1.001e+00   4.343e+00        0
-       2    2.796462e+02   1.687e+01   1.181e-01   8.250e+01        0
-       3    2.783945e+02   7.415e-01   3.725e-02   1.612e+01        0
-       4    2.783139e+02   6.301e-02   2.680e-03   1.906e+01        0
-       5    2.783133e+02   4.354e-03   9.674e-05   4.486e+00        0
-       6    2.783141e+02   2.527e-05   9.731e-07   1.777e-01        0
+       0    4.571230e+01   1.933e+02
+       1    3.214632e+01   9.234e+01   1.138e+00   8.192e+01        0
+       2    3.610677e+01   4.704e+01   2.013e+00   2.860e+01        0
+       3    3.706269e+01   9.912e+00   7.837e+00   4.769e+01        0
+       4    3.514870e+01   2.015e+00   2.866e-01   2.163e+01        0
+       5    3.517035e+01   1.885e-01   1.819e-02   4.030e+00        0
+       6    3.517336e+01   4.368e-03   2.458e-04   4.182e+00        0
+       7    3.517338e+01   1.191e-05   1.006e-06   2.994e-02        0
 
 EXIT: Locally optimal solution found.
 
 Final Statistics
 ----------------
-Final objective value               =   2.78314057707671e+02
-Final feasibility error (abs / rel) =   2.53e-05 / 1.31e-07
-Final optimality error  (abs / rel) =   9.73e-07 / 9.73e-09
-# of iterations                     =          6 
+Final objective value               =   3.51733795644124e+01
+Final feasibility error (abs / rel) =   1.19e-05 / 6.16e-08
+Final optimality error  (abs / rel) =   1.01e-06 / 5.82e-08
+# of iterations                     =          7 
 # of CG iterations                  =          0 
 # of function evaluations           =          8
 # of gradient evaluations           =          8
-# of Hessian evaluations            =          6
-Total program time (secs)           =       0.004 (     0.016 CPU time)
+# of Hessian evaluations            =          7
+Total program time (secs)           =       0.001 (     0.016 CPU time)
 Time spent in evaluations (secs)    =       0.000
 
 ===============================================================================
 
 Knitro 13.2.0: Locally optimal or satisfactory solution.
-objective 278.3140577; feasibility error 2.53e-05
-6 iterations; 8 function evaluations
+objective 35.17337956; feasibility error 1.19e-05
+7 iterations; 8 function evaluations
 
-** ACopf solve: end   (Fri Apr 12 16:11:50 2024 -> Fri Apr 12 16:11:50 2024)
+** ACopf solve: end   (Mon May 13 15:59:33 2024 -> Mon May 13 15:59:33 2024)
 ######################################################################
 
 
 ######################################################################
 ** ACopf results
-nb_iter_last = 6
-nb_iter_total = 6
+nb_iter_last = 7
+nb_iter_total = 7
 max({(qq,m,n) in BRANCHCC} (branch_R[1,qq,m,n])) = 0.22092
 max({(qq,m,n) in BRANCHCC} (branch_X[1,qq,m,n])) = 0.55618
 teta_max = 3.18579
-max({n in BUSCC} (teta[n])) = 0.204218
+max({n in BUSCC} (teta[n])) = 0.221981
 max({n in BUSCC} (teta_dc[n])) = 0.185788
 teta_min = -3.11751
-min({n in BUSCC} (teta[n])) = -0.153644
+min({n in BUSCC} (teta[n])) = -0.184144
 min({n in BUSCC} (teta_dc[n])) = -0.117511
-max({(qq,m,n) in BRANCHCC} (teta[m] - teta[n])) = 0.170346
+max({(qq,m,n) in BRANCHCC} (teta[m] - teta[n])) = 0.192356
 max({(qq,m,n) in BRANCHCC} (teta_dc[m] - teta_dc[n])) = 0.15933
-min({(qq,m,n) in BRANCHCC} (teta[m] - teta[n])) = -0.0542566
+min({(qq,m,n) in BRANCHCC} (teta[m] - teta[n])) = -0.0633503
 min({(qq,m,n) in BRANCHCC} (teta_dc[m] - teta_dc[n])) = -0.0413681
-min({n in BUSCC} (V[n])) = 0.775042
-max({n in BUSCC} (V[n])) = 1.3
+min({n in BUSCC} (V[n])) = 0.7
+max({n in BUSCC} (V[n])) = 1.18972
 
-'L1-5-1' R=0.054 X=0.223 delta=0.17 Vm=0.992 0.20 Vn=0.879 0.03 sQn 0.00 0.00 P1=75.4 Q1=35.3 P2=-80.7 Q2=-26.5 
-'L3-4-1' R=0.067 X=0.171 delta=-0.05 Vm=0.850 -0.05 Vn=0.871 0.00 sQm 0.00 0.00 sQn 0.00 0.00 P1=-23.8 Q1=-1.2 P2=23.7 Q2=1.5 
+'L2-3-1' R=0.047 X=0.198 delta=0.19 Vm=0.881 0.13 Vn=0.782 -0.06 P1=74.4 Q1=31.3 P2=-79.3 Q2=-19.7 
+'L3-4-1' R=0.067 X=0.171 delta=-0.06 Vm=0.782 -0.06 Vn=0.807 0.00 P1=-23.8 Q1=-1.6 P2=23.7 Q2=2.3 
 
-*** End of file reactiveopf.run at Fri Apr 12 16:11:50 2024 : Optimization successfull
-*** Elapsed time since start : 0.094000(s)
+*** End of file reactiveopf.run at Mon May 13 15:59:33 2024 : Optimization successfull
+*** Elapsed time since start : 0.015000(s)

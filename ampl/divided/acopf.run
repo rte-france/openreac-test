@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# Copyright (c) 2022 2023 2024, RTE (http://www.rte-france.com)
+# Copyright (c) 2022 2023, RTE (http://www.rte-france.com)
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
@@ -9,23 +9,10 @@
 
 ###############################################################################
 # Reactive OPF
-# Authors:  Jean Maeght 2022 2023
-#           Pierre Arvy 2023 2024
-############################################################################### 
+# Author:  Jean Maeght 2022 2023
+# Author:  Manuel Ruiz 2023 2024
+###############################################################################
 
-if 1 in LOG_INFO then {
-  display
-    maximal_voltage_upper_bound, minimal_voltage_lower_bound,
-    card(SUBSTATIONS),card(BUS),card(BUS2),card(BUSCC),card(BUS2 diff BUSCC),card(BUSVV),card(BUSCC_SLACK),card(BUSCC diff BUSCC_SLACK),
-    card(BRANCH),card(BRANCHCC),card(BRANCHZNULL),card(BRANCHCC diff BRANCHZNULL),
-    card(UNIT),card(UNITCC),card(UNITON),card(UNITON diff UNIT_FIXQ),card(UNIT_FIXQ),
-    card(LOAD),card(LOADCC),
-    card(SHUNTCC),card(SHUNT_FIX),card(SHUNT_VAR),
-    card(SVC),card(SVCCC),card(SVCON),
-    card(VSCCONV),card(VSCCONVON),
-    card(LCCCONV),card(LCCCONVON)
-;
-}
 
 ###############################################################################
 # Initial values of the solving
@@ -61,6 +48,14 @@ printf{LOG_KNITRO} "** ACopf solve: start (%s)\n\n",ctime();
 
 option knitro_options ("opttol=1 opttolabs=1e-1 feastol=1 feastolabs=1e-3 maxit=200 outlev=3");
 
+let {i in 1.._nvars} _var[i].xscalefactor := default_variable_scaling_factor;
+let {i in 1.._ncons} _con[i].cscalefactor := default_constraint_scaling_factor;
+
+let {n in BUSCC_SLACK} slack1_balance_Q[n].xscalefactor := reactive_slack_variable_scaling_factor;
+let {n in BUSCC_SLACK} slack2_balance_Q[n].xscalefactor := reactive_slack_variable_scaling_factor;
+
+let {(qq,m,n) in BRANCHCC_REGL_VAR} branch_Ror_var[qq,m,n].xscalefactor := transformer_ratio_variable_scaling_factor;
+
 # solve acopf and avoid knitro printing if user asks
 if (log_level_knitro <= 1) then {
   solve problem_acopf_objective > (nullDevice);
@@ -68,46 +63,9 @@ if (log_level_knitro <= 1) then {
   solve problem_acopf_objective;
 }
 
+
 let nb_iter_last := problem_acopf_objective.numiters;
 let nb_iter_total := nb_iter_total + nb_iter_last;
-
-# <= 103 : feasible
-# 200 convergence to unfeasible
-# > 200 : failure
-
-if solve_result_num > solve_result_num_limit then
-for {n in 1 .. 2}
-{
-  # solve acopf and avoid knitro printing if user asks
-  if (log_level_knitro <= 1) then {
-    solve problem_acopf_objective > (nullDevice);
-  } else {
-    solve problem_acopf_objective;
-  }
-
-  let nb_iter_last := problem_acopf_objective.numiters;
-  let nb_iter_total := nb_iter_total + nb_iter_last;
-  if solve_result_num <= solve_result_num_limit then break;
-}
-
-# In case of failure and coeff_alpha was 1, then switch to coeff_alpha=0 to give more freedom to generation
-if solve_result_num > solve_result_num_limit and coeff_alpha >= 0.999 then
-for {n in 1 .. 2}
-{
-  printf{LOG_DEBUG} "* change coeff_alpha from  %f ",coeff_alpha;
-  let coeff_alpha := 0.0;
-  printf{LOG_DEBUG} " to %f\n",coeff_alpha;
-
-  # solve acopf and avoid knitro printing if user asks
-  if (log_level_knitro <= 1) then {
-    solve problem_acopf_objective > (nullDevice);
-  } else {
-    solve problem_acopf_objective;
-  }
-  let nb_iter_last := problem_acopf_objective.numiters;
-  let nb_iter_total := nb_iter_total + nb_iter_last;
-  if solve_result_num <= solve_result_num_limit then break;
-}
 
 printf{LOG_KNITRO} "\n** ACopf solve: end   (%s -> %s)\n",tempstr,ctime();
 printf{LOG_KNITRO} "######################################################################\n\n";
@@ -117,6 +75,9 @@ printf{LOG_KNITRO} "############################################################
 # Analysis of solve_result_num
 ###############################################################################
 
+# <= 103 : feasible
+# 200 convergence to unfeasible
+# > 200 : failure
 if solve_result_num == 200
 then {
   let output_results := 0;
@@ -171,6 +132,9 @@ for {(qq,m,n) in BRANCHCC: (teta[m]-teta[n])>temp1*0.99 or (teta[m]-teta[n])<tem
   }
 
 # Ouput reactive slack values and voltages
+printf "\n";
+if 1 in LOG_INFO then display card(BUSCC_SLACK),
+                              card(BUSCC diff BUSCC_SLACK);
 if (sum{n in BUSCC_SLACK} slack1_balance_Q[n])+(sum{n in BUSCC_SLACK} slack2_balance_Q[n]) > Pnull
 then {
 

@@ -11,3 +11,9 @@ __pycache__
 
 # Execution
 /output
+
+# build
+build
+
+# Distribution
+openreactest.egg-info

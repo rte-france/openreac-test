@@ -10,6 +10,7 @@
 ###############################################################################
 # Reactive OPF
 # Author:  Jean Maeght 2022 2023
+# Author:  Manuel Ruiz 2023 2024
 ###############################################################################
 
 
@@ -177,14 +178,32 @@ then {
 let fileOut := "reactiveopf_results_reactive_slacks.csv";
 printf "#variant;bus;slack_condensator(Mvar);slack_self(Mvar);id;substation;\n" > (fileOut);
 printf{n in BUSCC_SLACK: slack1_balance_Q[n]>Pnull or slack2_balance_Q[n]>Pnull}
-  "%i;%i;%.2f;%.2f;%Q;%Q;\n",
+  "%i;%i;%.2f;%.2f;%s;%s;\n",
   1,n,
   if slack1_balance_Q[n]>Pnull then slack1_balance_Q[n] else 0,
   if slack2_balance_Q[n]>Pnull then slack2_balance_Q[n] else 0,
-  bus_id[1,n],
-  substation_id[1,bus_substation[1,n]]
+  '"' & bus_id[1,n] & '"',
+  '"' & substation_id[1,bus_substation[1,n]] & '"'
   > (fileOut);
 close (fileOut);
+
+}
+
+
+
+###############################################################################
+#
+# Writing results for buses states
+#
+###############################################################################
+if final_status == "OK" then {
+
+  let fileOut := "reactiveopf_results_voltages.csv";
+  printf "#variant;bus;V(pu);theta(rad);id;\n" > (fileOut);
+  printf {n in BUSCC} "%i;%i;%.3f;%.3f;%s;\n",
+    1, n, V[n], teta[n], '"' & bus_id[1,n] & '"'
+    > (fileOut);
+  close (fileOut);
 
 }
 
@@ -250,6 +269,10 @@ printf "%s %f\n","defaultQmaxPmaxRatio",defaultQmaxPmaxRatio > (fileOut);
 printf "%s %f\n","defaultQmin",defaultQmin > (fileOut);
 printf "%s %f\n","defaultQmax",defaultQmax > (fileOut);
 printf "%s %f\n","minimalQPrange",minimalQPrange > (fileOut);
+printf "%s %f\n","default_variable_scaling_factor",default_variable_scaling_factor > (fileOut);
+printf "%s %f\n","default_constraint_scaling_factor",default_constraint_scaling_factor > (fileOut);
+printf "%s %f\n","reactive_slack_variable_scaling_factor",reactive_slack_variable_scaling_factor > (fileOut);
+printf "%s %f\n","transformer_ratio_variable_scaling_factor",transformer_ratio_variable_scaling_factor > (fileOut);
 
 printf "\n" > (fileOut);
 printf "%s %i\n","nb_substations",card(SUBSTATIONS) > (fileOut);
