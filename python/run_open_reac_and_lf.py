@@ -1,5 +1,7 @@
-import pypowsybl as pp
 import math
+import pypowsybl as pp
+import pypowsybl.loadflow as lf
+import pypowsybl.voltage_initializer as v_init
 
 def add_voltage_limit_overrides(network, params):
     """
@@ -15,11 +17,25 @@ def add_voltage_limit_overrides(network, params):
     params.add_specific_high_voltage_limits(high_voltage_overrides)
 
 def test():
-    network = pp.network.create_ieee9()
-    params = pp.voltage_initializer.VoltageInitializerParameters()
+    network = pp.network.create_eurostag_tutorial_example1_network()
+
+    # open reac parameters
+    params = v_init.VoltageInitializerParameters()
     add_voltage_limit_overrides(network, params)
-    # run open reac
-    pp.voltage_initializer.run(network, params, True)
+    
+    # run open reac and apply results
+    or_results = v_init.run(network, params, True)
+    if (or_results.status == v_init.VoltageInitializerStatus.OK):
+        or_results.apply_all_modifications(network)
+
+    # load flow
+    lf_parameters=lf.Parameters(voltage_init_mode=lf.VoltageInitMode.PREVIOUS_VALUES)
+    lf_results = lf.run_ac(network, lf_parameters)
+    for result in lf_results:
+        print(result.status)
+        assert result.status == lf.ComponentStatus.CONVERGED
+
+
 
 if __name__ == "__main__":
     test()
