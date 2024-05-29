@@ -1,20 +1,10 @@
-# export results of acopf_preprocessing.run/mod files 
-let fileOut := "acopf_preprocessing_results.run";
-
-# corrected_unit_Qmin info
-printf "param "             > (fileOut);
-display corrected_unit_Pmin > (fileOut);
-
-# corrected_unit_Qmin info
-printf "param "             > (fileOut);
-display corrected_unit_Pmax > (fileOut);
-
-# corrected_unit_Qmin info
-printf "param "             > (fileOut);
-display corrected_unit_Qmin > (fileOut);
-
-# corrected_unit_Qmin info
-printf "param "             > (fileOut);
-display corrected_unit_Qmax > (fileOut);
-
+#  corrected bounds of the active generators
+let fileOut := "acopf_preprocessing_results.txt";
+printf "#num Pmin Pmax Qmin Qmax\n" > (fileOut); 
+printf{(g,n) in UNITON} "%i %.3f %.3f %.3f %.3f\n", 
+    g, 
+    corrected_unit_Pmin[g,n],
+    corrected_unit_Pmax[g,n],
+    corrected_unit_Qmin[g,n],
+    corrected_unit_Qmax[g,n]  > (fileOut);
 close (fileOut);
